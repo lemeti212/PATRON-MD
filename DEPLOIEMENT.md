@@ -75,7 +75,53 @@ d'environnement `WA_VERSION` (format `2.3000.1035194821`) — pratique sur Rende
 
 ---
 
-## Étape 1 — Générer la session (sur ton PC, une seule fois)
+## Erreur 405 en boucle : l'IP de l'hébergeur est refusée
+
+Si les logs enchaînent :
+
+```
+[!] Disconnected (405), retrying...
+[x] Max reconnect attempts reached (3). Restarting...
+```
+
+alors que la session a bien été restaurée et que la version annoncée est à jour,
+c'est que **WhatsApp refuse la plage IP de l'hébergeur**. Le 405 tombe pendant le
+handshake, avant toute vérification de session : le problème n'est ni ton
+`creds.json`, ni ta configuration.
+
+Le test qui tranche : lance `node main.js` sur ton PC. Si le bot se connecte
+depuis chez toi avec exactement le même `creds.json`, c'est l'IP.
+
+### Solution 1 — Changer de région (gratuit)
+
+Render ne permet pas de changer la région d'un service existant : il faut en
+créer un nouveau. Recrée le service en choisissant **Frankfurt** ou **Singapore**
+au lieu de la région par défaut, avec les mêmes variables d'environnement. Les
+plages IP sont différentes et souvent acceptées. Supprime ensuite l'ancien
+service pour ne pas consommer deux fois tes 750 heures.
+
+### Solution 2 — Passer par un proxy
+
+Si toutes les régions échouent, il faut sortir des IP de datacenter. Le projet
+accepte désormais une variable `PROXY_URL` :
+
+```
+PROXY_URL=http://utilisateur:motdepasse@hote:port
+PROXY_URL=socks5://utilisateur:motdepasse@hote:port
+```
+
+Variable absente, le comportement est inchangé (connexion directe). Quand elle
+est renseignée, `config.js` construit l'agent et `main.js` le transmet à Baileys,
+qui l'utilise pour le WebSocket **et** pour les envois de médias.
+
+Deux remarques :
+
+- Il faut un proxy **résidentiel**. Un proxy de datacenter, même gratuit, se fera
+  refuser exactement comme Render — c'est la même catégorie d'IP.
+- Un bot WhatsApp consomme très peu de bande passante ; les offres résidentielles
+  facturées au gigaoctet reviennent à quelques euros par mois.
+
+
 
 ```bash
 npm install

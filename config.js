@@ -55,6 +55,35 @@ global.waVersion = (function () {
     }
 })();
 
+console.log(chalk.cyan("→ Version WhatsApp annoncée : " + global.waVersion.join(".")));
+
+// Délai entre deux tentatives de reconnexion. Le fork retentait toutes les
+// 2 secondes : face à un refus 405, ce martèlement aggrave le blocage côté
+// WhatsApp et consomme les heures de l'hébergeur pour rien.
+global.reconnectDelay = Math.max(2000, Number(process.env.RECONNECT_DELAY) || 20000);
+
+//========= PROXY (contournement du refus des IP de datacenter) =========\\
+// WhatsApp rejette les connexions venant de certaines plages IP d'hébergeurs :
+// la socket est fermée avec le code 405 dès le handshake, session valide ou non.
+// Renseigner PROXY_URL fait passer Baileys par un proxy.
+//   http://user:pass@host:port     |     socks5://user:pass@host:port
+// Variable absente = connexion directe, comportement inchangé.
+global.waProxy = (function () {
+    const url = process.env.PROXY_URL;
+    if (!url) return null;
+    try {
+        const Agent = /^socks/i.test(url)
+            ? require("socks-proxy-agent").SocksProxyAgent
+            : require("https-proxy-agent").HttpsProxyAgent;
+        const agent = new Agent(url);
+        console.log(chalk.cyan("→ Proxy actif : " + url.replace(/\/\/[^@]*@/, "//***@")));
+        return { agent: agent, fetchAgent: agent };
+    } catch (e) {
+        console.log(chalk.red("✖ Proxy inutilisable (" + e.message + ") — connexion directe."));
+        return null;
+    }
+})();
+
 //========= RESTAURATION DE LA SESSION =========\\
 // SESSION_ID accepte deux formats :
 //   1. PATRON-MD~<base64 du creds.json>  -> restauré ici, hors ligne, sans dépendance externe

@@ -38,6 +38,8 @@
     "google-tts-api": "^2.0.2",
     "human-readable": "^0.2.1",
     "https": "^1.0.0",
+    "https-proxy-agent": "^7.0.6",
+    "socks-proxy-agent": "^8.0.5",
     "jimp": "^0.16.13",
     "link-preview-js": "^3.0.13",
     "lodash": "^4.17.21",

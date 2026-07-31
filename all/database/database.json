@@ -1,7 +1,15 @@
 {
-  "users": {},
+  "reconnect": 2,
+  "loadedPlugins": false,
   "groups": {},
-  "database": {},
   "settings": {},
-  "sticker": {}
+  "database": {},
+  "sticker": {},
+  "warns": {},
+  "setsudo": [],
+  "disabled": [],
+  "ban": [],
+  "gcban": [],
+  "plugins": {},
+  "users": {}
 }
