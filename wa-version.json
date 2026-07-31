@@ -1,0 +1,4 @@
+{
+  "_commentaire": "Version du client WhatsApp Web annoncée par le bot. patron-pro embarque une version figée de mars 2026 que WhatsApp refuse désormais. Source officielle : https://raw.githubusercontent.com/WhiskeySockets/Baileys/master/src/Defaults/baileys-version.json — si l'appairage recommence à echouer, remplacer le tableau ci-dessous par celui de cette page. Surchargeable par la variable d'environnement WA_VERSION (ex. 2.3000.1035194821).",
+  "version": [2, 3000, 1035194821]
+}

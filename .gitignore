@@ -1,0 +1,31 @@
+# === SECRETS — dépôt public, ne jamais committer ===
+.env
+.env.*
+SESSION_ID.txt
+creds.json
+session.json
+tmp/session/
+tmp/session/**
+
+# === Dépendances ===
+node_modules/
+package-lock.json
+yarn.lock
+
+# === Fichiers générés à l'exécution ===
+tmp/*.jpg
+tmp/*.png
+tmp/*.mp4
+tmp/*.webp
+tmp/*.mp3
+tmp/*.ogg
+tmp/*.bin
+*.log
+npm-debug.log*
+.pm2/
+
+# === Système / éditeur ===
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
