@@ -98,8 +98,22 @@ async function resolveVersion () {
 }
 
 async function finish (sock) {
-  // Baileys écrit les clés de façon asynchrone juste après l'ouverture.
-  await delay(6000)
+  // Baileys continue d'écrire des clés pendant la synchronisation initiale.
+  // Couper trop tôt fige un creds.json que WhatsApp refuse ensuite à la reprise.
+  // On attend donc que les écritures se taisent : 6 s sans mise à jour,
+  // 45 s au maximum.
+  console.log('⏳ Attente de la fin de la synchronisation…')
+  let lastWrite = Date.now()
+  const onWrite = () => { lastWrite = Date.now() }
+  sock.ev.on('creds.update', onWrite)
+
+  const deadline = Date.now() + 45000
+  while (Date.now() < deadline && Date.now() - lastWrite < 6000) {
+    await delay(1000)
+  }
+  sock.ev.off('creds.update', onWrite)
+  await delay(2000)
+  console.log('   synchronisation terminée.')
 
   if (!fs.existsSync(CREDS_FILE)) {
     console.error("❌ creds.json introuvable — l'appairage n'a pas abouti.")

@@ -55,7 +55,29 @@ global.waVersion = (function () {
     }
 })();
 
-console.log(chalk.cyan("→ Version WhatsApp annoncée : " + global.waVersion.join(".")));
+// WhatsApp fait évoluer cette version très vite et refuse les périmées avec un
+// 405. On récupère donc la version courante au démarrage ; wa-version.json ne
+// sert que de repli si la source est injoignable.
+// Appelé par main.js juste avant startBot().
+global.refreshWaVersion = async function () {
+    if (process.env.WA_VERSION) return global.waVersion;
+    try {
+        const res = await require("axios").get(
+            "https://raw.githubusercontent.com/WhiskeySockets/Baileys/master/src/Defaults/baileys-version.json",
+            { timeout: 10000, responseType: "json" }
+        );
+        const data = typeof res.data === "string" ? JSON.parse(res.data) : res.data;
+        if (Array.isArray(data.version) && data.version.length === 3) {
+            global.waVersion = data.version;
+        }
+    } catch (e) {
+        console.log(chalk.yellow("⚠ Version en ligne injoignable, repli sur wa-version.json."));
+    }
+    console.log(chalk.cyan("→ Version WhatsApp annoncée : " + global.waVersion.join(".")));
+    return global.waVersion;
+};
+
+console.log(chalk.cyan("→ Version WhatsApp au démarrage : " + global.waVersion.join(".")));
 
 // Délai entre deux tentatives de reconnexion. Le fork retentait toutes les
 // 2 secondes : face à un refus 405, ce martèlement aggrave le blocage côté
